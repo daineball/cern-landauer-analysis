@@ -1,3 +1,4 @@
+[![DOI](https://shields.io)](https://doi.org)
 # CERN Landauer Mass Feasibility Analysis & Cosmological Estimator
 
 A Python simulation framework investigating information-mass equivalence. It models single-bit Landauer mass deficits within cryogenic environments and derives cosmological dark-sector boundaries.
