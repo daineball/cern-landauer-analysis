@@ -52,36 +52,48 @@ SEARCH_TERMS = [
 ]
 
 # ── Known experiment precisions (from published literature) ──────────────────
+# v3 SOURCE AUDIT: Each entry now records what was ACTUALLY measured
+# ("observable"). Only genuine mass-comparable observables get a
+# mass_sensitivity_kg value; others are None and excluded from gap math.
 EXPERIMENTS = {
     "BASE (CERN AD)": {
         "description": "Baryon Antibaryon Symmetry Experiment — Penning trap",
+        "observable": "antiproton/proton charge-to-mass ratio",
         "temperature_K": 0.006,
-        "mass_ratio_precision": 6.9e-13,
-        "absolute_mass_precision_kg": M_P * 6.9e-13,
-        "reference": "Ulmer et al. Nature 601, 2022",
-        "note": "Lowest temperature but Landauer signal shrinks faster "
-                "than precision improves — least suitable candidate"
+        "fractional_precision": 1.6e-12,   # 16 parts per trillion
+        "mass_sensitivity_kg": M_P * 1.6e-12,
+        "mass_comparable": True,
+        "assumption": "Treats fractional q/m precision as fractional mass "
+                      "precision, assuming charge is exactly conserved (CPT).",
+        "reference": "Borchert, Ulmer et al., Nature 601, 53-57 (2022)",
+        "note": "Only experiment here with a mass-family observable. "
+                "Ultra-cold operation shrinks the Landauer signal itself."
     },
     "ALPHA-2 (CERN AD)": {
-        "description": "Antihydrogen laser spectroscopy — magnetic trap",
+        "description": "Antihydrogen 1S-2S laser spectroscopy — magnetic trap",
+        "observable": "1S-2S transition frequency (NOT a mass measurement)",
         "temperature_K": 0.5,
-        "mass_ratio_precision": 2.0e-12,
-        "absolute_mass_precision_kg": M_P * 2.0e-12,
-        "reference": "ALPHA Collaboration, Nature 557, 2018",
-        "note": "Best candidate — gap of ~1.8 OOM, warmer temp keeps "
-                "Landauer signal larger relative to precision"
+        "fractional_precision": 2.0e-12,
+        "mass_sensitivity_kg": None,
+        "mass_comparable": False,
+        "assumption": None,
+        "reference": "ALPHA Collaboration, Nature 557, 71-75 (2018)",
+        "note": "Frequency precision cannot be honestly converted to an "
+                "absolute mass sensitivity without a model-dependent chain."
     },
     "ATRAP (CERN AD)": {
-        "description": "Antihydrogen trap — cyclotron frequency comparison",
+        "description": "Antiproton magnetic moment measurement — Penning trap",
+        "observable": "antiproton magnetic moment (NOT a mass measurement)",
         "temperature_K": 4.2,
-        "mass_ratio_precision": 9.0e-12,
-        "absolute_mass_precision_kg": M_P * 9.0e-12,
-        "reference": "Gabrielse et al. PRL 2012",
-        "note": "Earlier generation, ~1.5 OOM gap — superseded by BASE "
-                "but warmer temp is actually advantageous for this test"
+        "fractional_precision": 4.4e-9,
+        "mass_sensitivity_kg": None,
+        "mass_comparable": False,
+        "assumption": None,
+        "reference": "DiSciacca et al. (ATRAP), PRL 110, 130801 (2013)",
+        "note": "Magnetic-moment precision is a different observable class; "
+                "listed for completeness, excluded from mass gap analysis."
     },
 }
-
 
 # ── Landauer calculations ─────────────────────────────────────────────────────
 
