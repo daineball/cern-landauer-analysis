@@ -1,6 +1,6 @@
 ==============================================================================
   CERN / Published-Result Landauer Analysis Sandbox
-  Run: 2026-09-19 05:38
+  Run: 2026-09-19 05:51
   Revision: September 2026 provenance + observable audit
 ==============================================================================
 
@@ -64,9 +64,11 @@
     Temperature         : 0.006 K
     Landauer E/c² scale : 6.389e-43 kg/bit
     Comparison precision: 2.676e-39 kg
+    Ratio to 1-bit scale: 4.189e+03×
+    Gap to 1-bit scale  : 3.6 OOM
     0.1× target scale   : 6.389e-44 kg
-    Scale ratio         : 4.189e+04×
-    Gap                 : 3.6 OOM
+    Ratio to 0.1× target: 4.189e+04×
+    Gap to 0.1× target  : 4.6 OOM
     Assumption          : For this exploratory comparison only, fractional q/m precision is treated as fractional mass sensitivity with charge magnitude held fixed. The reported BASE observable itself is q/m.
 
   NOTE:

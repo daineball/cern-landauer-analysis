@@ -412,10 +412,14 @@ def detection_requirements(rows):
     for row in comparable:
         exp = row["experiment"]
 
-        # Historical sandbox convention: target sensitivity one tenth of the
-        # one-bit mass-equivalent scale.
-        required = row["landauer_mass_equivalent_kg"] * 0.1
-        improvement = row["mass_sensitivity_kg"] / required
+        # Report the one-bit Landauer comparison separately from the
+        # historical sandbox target of one tenth of that scale.
+        landauer_scale = row["landauer_mass_equivalent_kg"]
+        ratio_to_landauer = row["mass_sensitivity_kg"] / landauer_scale
+
+        required = landauer_scale * 0.1
+        ratio_to_target = row["mass_sensitivity_kg"] / required
+        target_gap_oom = math.log10(ratio_to_target)
 
         print(f"\n  {row['name']}")
         print(f"    Observable          : {exp['observable']}")
@@ -428,9 +432,11 @@ def detection_requirements(rows):
             "    Comparison precision: "
             f"{row['mass_sensitivity_kg']:.3e} kg"
         )
+        print(f"    Ratio to 1-bit scale: {ratio_to_landauer:.3e}×")
+        print(f"    Gap to 1-bit scale  : {row['gap_oom']:.1f} OOM")
         print(f"    0.1× target scale   : {required:.3e} kg")
-        print(f"    Scale ratio         : {improvement:.3e}×")
-        print(f"    Gap                 : {row['gap_oom']:.1f} OOM")
+        print(f"    Ratio to 0.1× target: {ratio_to_target:.3e}×")
+        print(f"    Gap to 0.1× target  : {target_gap_oom:.1f} OOM")
         print(f"    Assumption          : {exp['assumption']}")
 
     print()
