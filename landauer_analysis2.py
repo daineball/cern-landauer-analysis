@@ -1,366 +1,560 @@
 """
-CERN Open Data — Landauer Mass Feasibility Analysis  v2
-========================================================
-Paper: "The Macro-Biological Architecture of the Simultaneous Universe"
-Author: Daine W. Ball (2026)
+CERN / Published-Result Landauer Analysis Sandbox
+==================================================
 
-Changes from v1:
-  - Fixed floating point overflow for n=10^500 using Python's arbitrary
-    precision integers and the `decimal` module
-  - Added backward calculation: what n makes rho_Theta match observed
-    dark energy density?
-  - Corrected plain language summary to match actual computed numbers
-  - Added ALPHA-2 as primary candidate (closer gap than BASE)
+Computational companion to:
+
+    The Coalescence of Thought
+    A Multiscale Causal Framework for Persistent Self-Influence
+    in Physical Systems
+
+Author: Daine W. Ball
+Revision: September 2026
+
+DATA PROVENANCE POLICY
+----------------------
+
+This analysis uses public machine-readable experimental datasets where they
+are available.
+
+Where the underlying experimental dataset is not publicly released, the
+analysis uses the collaboration's published measurement and reported
+uncertainty as the experimental input.
+
+Published results are never represented as raw-data reproductions.
+Missing observations are never reconstructed or synthesized.
+
+Every experimental input therefore carries an explicit source type:
+
+    PUBLIC_DATASET
+        A public machine-readable experimental dataset is available and may
+        be queried or processed directly.
+
+    PUBLISHED_RESULT
+        The underlying raw measurements are not presently available through
+        the queried public-data source. The peer-reviewed collaboration result
+        and its reported uncertainty are used instead.
+
+OBSERVABLE POLICY
+-----------------
+
+Different physical observables are not silently converted into mass
+measurements.
+
+BASE:
+    antiproton/proton charge-to-mass ratio.
+    Mass-comparable here only under the explicitly declared assumption that
+    the charge magnitude is fixed when interpreting fractional q/m precision
+    as fractional mass sensitivity.
+
+ALPHA-2:
+    antihydrogen 1S-2S transition frequency.
+    Not treated as a direct mass measurement.
+
+ATRAP:
+    antiproton magnetic moment.
+    Not treated as a direct mass measurement.
+
+SCIENTIFIC SCOPE
+----------------
+
+Landauer's bound constrains the minimum dissipated energy associated with
+logically irreversible information erasure:
+
+    E >= k_B T ln(2)
+
+The quantity E/c^2 can be expressed as a mass-equivalent bookkeeping value.
+This sandbox explores numerical scales and experimental sensitivities.
+
+It does NOT establish:
+    - a new physical mass contribution,
+    - a new gravitational coupling,
+    - dark matter or dark energy from information,
+    - consciousness from Landauer energy,
+    - or empirical confirmation of The Coalescence of Thought.
+
+The revised theoretical framework treats information thermodynamics as a
+constraint on apparatus energy accounting, not as an additional energy
+reservoir.
 
 Requirements:
-    pip install requests numpy matplotlib
-    (no extra libs needed — uses Python stdlib `decimal` for big numbers)
+    pip install requests
 
 Run:
-    python3 cern_landauer_analysis_v2.py
+    python3 landauer_analysis2.py
 """
 
-import requests
-import numpy as np
 import math
-from decimal import Decimal, getcontext
 from datetime import datetime
 
-# Set decimal precision high enough for 10^500 arithmetic
-getcontext().prec = 600
+import requests
 
-# ── Physical constants (high precision) ──────────────────────────────────────
-K_B    = 1.380649e-23    # Boltzmann constant       [J/K]
-C      = 2.99792458e8    # Speed of light           [m/s]
-LN2    = math.log(2)     # ln(2)
-G      = 6.67430e-11     # Gravitational constant   [m³/kg·s²]
-M_P    = 1.67262192e-27  # Proton mass              [kg]
-HBAR   = 1.054571817e-34 # Reduced Planck constant  [J·s]
 
-# Decimal versions for big-number arithmetic
-D_K_B  = Decimal(str(K_B))
-D_C    = Decimal(str(C))
-D_LN2  = Decimal(str(LN2))
+# ── Physical constants ────────────────────────────────────────────────────────
 
-# ── CERN Open Data API ────────────────────────────────────────────────────────
-SEARCH_URL = "https://opendata.cern.ch/api/records"
+K_B = 1.380649e-23       # Boltzmann constant [J/K], exact SI
+C = 2.99792458e8         # speed of light [m/s], exact SI
+LN2 = math.log(2)
+M_P = 1.67262192595e-27  # proton mass [kg], numerical reference value
+
+
+# ── Provenance classes ────────────────────────────────────────────────────────
+
+PUBLIC_DATASET = "PUBLIC_DATASET"
+PUBLISHED_RESULT = "PUBLISHED_RESULT"
+
+
+# ── CERN Open Data discovery ─────────────────────────────────────────────────
+
+SEARCH_URL = "https://opendata.cern.ch/api/records/"
+
 SEARCH_TERMS = [
     "penning trap",
     "BASE antiproton",
     "ALPHA antihydrogen",
     "proton antiproton mass ratio",
+    "ATRAP",
+    "antiproton magnetic moment",
 ]
 
-# ── Known experiment precisions (from published literature) ──────────────────
-# v3 SOURCE AUDIT: Each entry now records what was ACTUALLY measured
-# ("observable"). Only genuine mass-comparable observables get a
-# mass_sensitivity_kg value; others are None and excluded from gap math.
+
+# ── Experimental inputs ───────────────────────────────────────────────────────
+#
+# IMPORTANT:
+#
+# source_type describes what THIS PROGRAM actually consumes.
+#
+# A PUBLISHED_RESULT entry means we use the collaboration's reported observable
+# and uncertainty. It does not mean that the collaboration lacked underlying
+# data; it means this sandbox is not claiming to have reproduced that raw-data
+# analysis.
+#
+# A PUBLIC_DATASET entry should identify the actual machine-readable dataset
+# and the code path used to derive the observable from it.
+#
+
 EXPERIMENTS = {
     "BASE (CERN AD)": {
-        "description": "Baryon Antibaryon Symmetry Experiment — Penning trap",
-        "observable": "antiproton/proton charge-to-mass ratio",
+        "description":
+            "Baryon Antibaryon Symmetry Experiment — Penning trap",
+
+        "observable":
+            "antiproton/proton charge-to-mass ratio",
+
+        "source_type": PUBLISHED_RESULT,
+
+        "published_result":
+            "-(q/m)_p / (q/m)_pbar = 1.000000000003(16)",
+
         "temperature_K": 0.006,
-        "fractional_precision": 1.6e-12,   # 16 parts per trillion
+
+        # 16 parts per trillion reported uncertainty scale.
+        "fractional_precision": 1.6e-12,
+
+        # Exploratory mass-equivalent sensitivity. This is NOT an independent
+        # direct mass measurement.
         "mass_sensitivity_kg": M_P * 1.6e-12,
+
         "mass_comparable": True,
-        "assumption": "Treats fractional q/m precision as fractional mass "
-                      "precision, assuming charge is exactly conserved (CPT).",
-        "reference": "Borchert, Ulmer et al., Nature 601, 53-57 (2022)",
-        "note": "Only experiment here with a mass-family observable. "
-                "Ultra-cold operation shrinks the Landauer signal itself."
+
+        "assumption":
+            "For this exploratory comparison only, fractional q/m precision "
+            "is treated as fractional mass sensitivity with charge magnitude "
+            "held fixed. The reported BASE observable itself is q/m.",
+
+        "reference":
+            "Borchert, Ulmer et al., Nature 601, 53-57 (2022)",
+
+        "doi":
+            "https://doi.org/10.1038/s41586-021-04203-w",
+
+        "note":
+            "Published collaboration result used because the underlying "
+            "measurement series is not being consumed as a public dataset "
+            "by this sandbox.",
     },
+
     "ALPHA-2 (CERN AD)": {
-        "description": "Antihydrogen 1S-2S laser spectroscopy — magnetic trap",
-        "observable": "1S-2S transition frequency (NOT a mass measurement)",
+        "description":
+            "Antihydrogen 1S-2S laser spectroscopy — magnetic trap",
+
+        "observable":
+            "1S-2S transition frequency",
+
+        "source_type": PUBLISHED_RESULT,
+
+        "published_result":
+            "Published ALPHA 1S-2S spectroscopy result; see cited paper.",
+
         "temperature_K": 0.5,
         "fractional_precision": 2.0e-12,
+
         "mass_sensitivity_kg": None,
         "mass_comparable": False,
         "assumption": None,
-        "reference": "ALPHA Collaboration, Nature 557, 71-75 (2018)",
-        "note": "Frequency precision cannot be honestly converted to an "
-                "absolute mass sensitivity without a model-dependent chain."
+
+        "reference":
+            "ALPHA Collaboration, Nature 557, 71-75 (2018)",
+
+        "doi":
+            "https://doi.org/10.1038/s41586-018-0017-2",
+
+        "note":
+            "Frequency precision is retained as spectroscopy precision. "
+            "It is not converted into an absolute mass sensitivity.",
     },
-    "ATRAP (CERN AD)": {
-        "description": "Antiproton magnetic moment measurement — Penning trap",
-        "observable": "antiproton magnetic moment (NOT a mass measurement)",
+
+    "ATRAP": {
+        "description":
+            "Antiproton magnetic-moment measurement — Penning trap",
+
+        "observable":
+            "antiproton magnetic moment",
+
+        "source_type": PUBLISHED_RESULT,
+
+        "published_result":
+            "mu_pbar / mu_N = -2.792845 +/- 0.000012",
+
         "temperature_K": 4.2,
-        "fractional_precision": 4.4e-9,
+        "fractional_precision": 4.4e-6,
+
         "mass_sensitivity_kg": None,
         "mass_comparable": False,
         "assumption": None,
-        "reference": "DiSciacca et al. (ATRAP), PRL 110, 130801 (2013)",
-        "note": "Magnetic-moment precision is a different observable class; "
-                "listed for completeness, excluded from mass gap analysis."
+
+        "reference":
+            "DiSciacca et al. (ATRAP), Phys. Rev. Lett. 110, 130801 (2013)",
+
+        "doi":
+            "https://doi.org/10.1103/PhysRevLett.110.130801",
+
+        "note":
+            "Magnetic moment is a different observable class and is excluded "
+            "from the mass-sensitivity gap calculation.",
     },
 }
 
+
 # ── Landauer calculations ─────────────────────────────────────────────────────
 
-def landauer_mass(T_kelvin, n_bits=1):
-    """Mass equivalent of erasing n_bits at temperature T  [kg]"""
-    return n_bits * (LN2 * K_B * T_kelvin) / (C ** 2)
+def landauer_energy(T_kelvin, n_bits=1):
+    """Landauer lower-bound energy for n_bits irreversible erasures [J]."""
+    return n_bits * LN2 * K_B * T_kelvin
 
 
-def landauer_mass_decimal(T_kelvin, n_bits_exp):
+def landauer_mass_equivalent(T_kelvin, n_bits=1):
     """
-    Mass equivalent using Decimal arithmetic for huge n.
-    n_bits_exp: exponent only — computes n = 10^n_bits_exp
-    Returns Decimal in kg.
+    E/c^2 mass-equivalent of the Landauer lower-bound energy [kg].
+
+    This is an energy-equivalent bookkeeping quantity. It is not asserted to
+    constitute an additional physical mass reservoir.
     """
-    T   = Decimal(str(T_kelvin))
-    n   = Decimal(10) ** n_bits_exp
-    return (n * D_LN2 * D_K_B * T) / (D_C ** 2)
+    return landauer_energy(T_kelvin, n_bits) / (C ** 2)
 
 
-def rho_theta_decimal(T_kelvin, n_bits_exp, V_universe):
-    """Thought-mass density  [kg/m³]  using Decimal for big n"""
-    mass = landauer_mass_decimal(T_kelvin, n_bits_exp)
-    V    = Decimal(str(V_universe))
-    return mass / V
+# ── CERN query ────────────────────────────────────────────────────────────────
 
+def query_cern(term, max_results=5):
+    """Query CERN Open Data. Return None on transport/API failure."""
+    params = {
+        "q": term,
+        "size": max_results,
+    }
 
-# ── Query CERN Open Data Portal ───────────────────────────────────────────────
-
-def query_cern(term, max_results=3):
-    params = {"q": term, "type": "Dataset", "size": max_results}
     try:
-        r = requests.get(SEARCH_URL, params=params, timeout=10)
-        r.raise_for_status()
-        return r.json().get("hits", {}).get("hits", [])
-    except Exception:
+        response = requests.get(
+            SEARCH_URL,
+            params=params,
+            timeout=15,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        return payload.get("hits", {}).get("hits", [])
+    except (requests.RequestException, ValueError):
         return None
 
 
 def find_datasets():
-    print("\n── Querying CERN Open Data Portal ──────────────────────────────")
-    found = []
+    """
+    Discovery only.
+
+    A search hit is NOT automatically treated as experimental input.
+    A dataset becomes authoritative input only after its provenance,
+    observable, and analysis path have been explicitly validated.
+    """
+
+    print("\n── CERN Open Data Discovery ─────────────────────────────────────")
+
+    total_hits = 0
+
     for term in SEARCH_TERMS:
         results = query_cern(term)
+
         if results is None:
-            print("  [offline] Cannot reach opendata.cern.ch")
-            print("  Proceeding with published precision values.")
-            break
+            print(f"  {term:<36} API unavailable")
+            continue
+
+        print(f"  {term:<36} {len(results)} returned hit(s)")
+        total_hits += len(results)
+
         for hit in results:
-            meta  = hit.get("metadata", {})
-            title = meta.get("title", "untitled")
+            meta = hit.get("metadata", {})
             recid = hit.get("id", "?")
-            exp   = (meta.get("experiment") or ["unknown"])[0]
-            url   = f"https://opendata.cern.ch/record/{recid}"
-            found.append({"title": title, "id": recid,
-                          "experiment": exp, "url": url})
-            print(f"  [{exp}] {title}")
-            print(f"   → {url}")
-    if not found:
-        print("  No live Penning trap datasets found on portal.")
-        print("  BASE/ALPHA raw data not yet publicly released.")
-    return found
+            title = meta.get("title", "untitled")
+            experiment = ", ".join(meta.get("experiment") or ["unknown"])
+
+            print(f"      [{experiment}] record {recid}: {title}")
+            print(f"      https://opendata.cern.ch/record/{recid}")
+
+    if total_hits == 0:
+        print()
+        print("  No records were returned for the target search terms.")
+        print("  This establishes only the result of the current catalogue")
+        print("  queries; it does NOT establish that underlying data do not")
+        print("  exist elsewhere.")
+        print()
+        print("  Published collaboration results will therefore be used for")
+        print("  target experiments configured as PUBLISHED_RESULT.")
+
+    return total_hits
 
 
-# ── Feasibility table ─────────────────────────────────────────────────────────
+# ── Provenance report ─────────────────────────────────────────────────────────
+
+def provenance_report():
+    print("\n── Experimental Input Provenance ────────────────────────────────")
+
+    for name, exp in EXPERIMENTS.items():
+        print(f"\n  {name}")
+        print(f"    Source type : {exp['source_type']}")
+        print(f"    Observable  : {exp['observable']}")
+        print(f"    Result      : {exp['published_result']}")
+        print(f"    Precision   : {exp['fractional_precision']:.3e} fractional")
+        print(f"    Reference   : {exp['reference']}")
+        print(f"    DOI         : {exp['doi']}")
+
+        if exp["mass_comparable"]:
+            print("    Mass gap    : eligible under declared assumption")
+            print(f"    Assumption  : {exp['assumption']}")
+        else:
+            print("    Mass gap    : N/A — incompatible observable")
+
+
+# ── Mass-equivalent comparison ────────────────────────────────────────────────
 
 def feasibility_report():
-    print("\n── Landauer Mass Predictions vs Experiment Precision ───────────")
-    print(f"  {'Experiment':<22} {'Temp':>8}  {'Landauer/bit':>14}  "
-          f"{'Expt precision':>16}  {'Gap (OOM)':>10}  Detectable?")
-    print("  " + "─" * 95)
+    print("\n── Landauer Energy / Mass-Equivalent Scale ─────────────────────")
+
+    print(
+        f"  {'Experiment':<22}"
+        f"{'Temp':>10}"
+        f"{'Landauer E/bit':>20}"
+        f"{'E/c² per bit':>20}"
+        f"{'Mass sensitivity':>20}"
+        f"{'Gap':>10}"
+    )
+
+    print("  " + "─" * 102)
 
     rows = []
+
     for name, exp in EXPERIMENTS.items():
-        T   = exp["temperature_K"]
-        L   = landauer_mass(T, n_bits=1)
-        P   = exp["absolute_mass_precision_kg"]
-        det = L >= P
-        gap = math.log10(P / L) if not det else 0.0
-        rows.append((name, T, L, P, det, gap, exp))
-        flag = "YES" if det else f"NO"
-        print(f"  {name:<22} {T:>8.4f}K  {L:>14.3e} kg  "
-              f"{P:>16.3e} kg  {gap:>10.1f}  {flag}")
+        temperature = exp["temperature_K"]
+
+        energy = landauer_energy(temperature)
+        mass_eq = landauer_mass_equivalent(temperature)
+
+        sensitivity = exp["mass_sensitivity_kg"]
+
+        if exp["mass_comparable"] and sensitivity is not None:
+            gap = math.log10(sensitivity / mass_eq)
+            sensitivity_text = f"{sensitivity:.3e}"
+            gap_text = f"{gap:.1f} OOM"
+        else:
+            gap = None
+            sensitivity_text = "N/A"
+            gap_text = "N/A"
+
+        rows.append({
+            "name": name,
+            "temperature_K": temperature,
+            "landauer_energy_J": energy,
+            "landauer_mass_equivalent_kg": mass_eq,
+            "mass_sensitivity_kg": sensitivity,
+            "gap_oom": gap,
+            "experiment": exp,
+        })
+
+        print(
+            f"  {name:<22}"
+            f"{temperature:>9.4f}K"
+            f"{energy:>20.3e}"
+            f"{mass_eq:>20.3e}"
+            f"{sensitivity_text:>20}"
+            f"{gap_text:>10}"
+        )
+
     return rows
 
 
-# ── Detection requirements ────────────────────────────────────────────────────
+# ── Detection / scale report ──────────────────────────────────────────────────
 
 def detection_requirements(rows):
-    print("\n── Detection Requirements ───────────────────────────────────────")
-    for name, T, L, P, det, gap, exp in rows:
-        needed = L * 0.1
-        impr   = P / needed
-        print(f"\n  {name}")
-        print(f"    Temperature       : {T} K")
-        print(f"    Landauer signal   : {L:.3e} kg/bit")
-        print(f"    Current precision : {P:.3e} kg")
-        print(f"    Required precision: {needed:.3e} kg")
-        print(f"    Improvement needed: {impr:.2e}×  ({gap:.1f} orders of magnitude)")
-        print(f"    Note              : {exp['note']}")
+    print("\n── Exploratory Mass-Sensitivity Comparison ─────────────────────")
 
+    comparable = [row for row in rows if row["gap_oom"] is not None]
 
-# ── Cosmological estimate — FIXED ────────────────────────────────────────────
+    if not comparable:
+        print("  No configured observable is mass-comparable.")
+        return
 
-def cosmological_estimate():
-    print("\n── ρ_Θ Cosmological Estimate (v2 — overflow fixed) ─────────────")
+    for row in comparable:
+        exp = row["experiment"]
 
-    T_cmb         = 2.725        # K
-    V_universe    = 4e80         # m³
-    rho_observed  = 6.9e-27      # kg/m³  observed dark energy
-    rho_qft       = 1e96         # kg/m³  QFT vacuum prediction
+        # Historical sandbox convention: target sensitivity one tenth of the
+        # one-bit mass-equivalent scale.
+        required = row["landauer_mass_equivalent_kg"] * 0.1
+        improvement = row["mass_sensitivity_kg"] / required
 
-    test_cases = [
-        ("String landscape (10^500)", 500),
-        ("Bekenstein bound (10^122)", 122),
-        ("Observable particles (10^89)", 89),
-        ("Baryons only (10^80)", 80),
-    ]
+        print(f"\n  {row['name']}")
+        print(f"    Observable          : {exp['observable']}")
+        print(f"    Temperature         : {row['temperature_K']} K")
+        print(
+            "    Landauer E/c² scale : "
+            f"{row['landauer_mass_equivalent_kg']:.3e} kg/bit"
+        )
+        print(
+            "    Comparison precision: "
+            f"{row['mass_sensitivity_kg']:.3e} kg"
+        )
+        print(f"    0.1× target scale   : {required:.3e} kg")
+        print(f"    Scale ratio         : {improvement:.3e}×")
+        print(f"    Gap                 : {row['gap_oom']:.1f} OOM")
+        print(f"    Assumption          : {exp['assumption']}")
 
-    print(f"\n  {'n (bits)':<35} {'ρ_Θ (kg/m³)':>18}  "
-          f"{'ρ_Θ/ρ_observed':>16}  {'ρ_Θ/ρ_QFT':>14}")
-    print("  " + "─" * 90)
-
-    for label, exp in test_cases:
-        rho = rho_theta_decimal(T_cmb, exp, V_universe)
-        rho_f = float(rho)
-        r_obs = rho_f / rho_observed
-        r_qft = rho_f / rho_qft
-        print(f"  {label:<35} {rho_f:>18.3e}  {r_obs:>16.3e}  {r_qft:>14.3e}")
-
-    # ── Backward calculation: what n balances the equation? ──────────────────
-    print("\n── Backward Calculation: What n makes ρ_Θ = ρ_observed? ────────")
-    print(f"\n  Target: ρ_observed = {rho_observed:.3e} kg/m³")
-    print(f"  Solving: n = ρ_observed × V × c² / (ln2 × kB × T_cmb)\n")
-
-    n_exact = (rho_observed * V_universe * C**2) / (LN2 * K_B * T_cmb)
-    n_exp   = math.log10(n_exact)
-
-    print(f"  n (exact float) = {n_exact:.4e}")
-    print(f"  n (as power)    = 10^{n_exp:.2f}")
     print()
-    print(f"  ── What is 10^{n_exp:.0f}? ──────────────────────────────────────")
-    print(f"  10^89  = estimated number of photons in observable universe")
-    print(f"  10^80  = estimated number of baryons in observable universe")
-    print(f"  10^{n_exp:.0f}  = n required for ρ_Θ to match dark energy density")
+    print("  NOTE:")
+    print("  This is a numerical sensitivity comparison, not a prediction")
+    print("  that an additional mass deficit exists or would be measured.")
+
+
+# ── Analytical controls ───────────────────────────────────────────────────────
+
+def analytical_controls():
+    """
+    Minimal computational controls aligned with the revised framework.
+
+    Persistence alone cannot identify recurrence:
+      * feed-forward storage can preserve an earlier signal;
+      * recurrence requires an intact-vs-feedback-cut contrast.
+
+    These are analytical demonstrations, not empirical CERN results.
+    """
+
+    print("\n── Analytical Controls: Persistence vs Feedback ────────────────")
+
+    # Negative control:
+    # Six-stage perfect delay line. An input persists six steps downstream,
+    # but there is no return edge to cut.
+    intact_delay = 1.0
+    cut_delay = 1.0
+    o_delay = intact_delay - cut_delay
+
+    # Positive toy control:
+    # A normalized recurrent contribution is present in the intact toy system
+    # and absent after its declared return edge is cut.
+    intact_recurrent = 1.0
+    cut_recurrent = 0.35
+    o_recurrent = intact_recurrent - cut_recurrent
+
     print()
+    print("  Feed-forward delay line")
+    print(f"    C_H intact : {intact_delay:.3f}")
+    print(f"    C_H cut    : {cut_delay:.3f}")
+    print(f"    O_H        : {o_delay:.3f}")
+    print("    Interpretation: persistence without feedback-specific effect.")
 
-    if 85 <= n_exp <= 95:
-        print("  ✓ This falls between the photon count and baryon count —")
-        print("    physically meaningful. n is not the landscape (10^500)")
-        print("    but the actual active information states in the universe.")
-        print()
-        print("  Paper revision suggested:")
-        print(f"   'The value n ~ 10^{n_exp:.0f} required to match observed dark")
-        print(f"    energy density falls within the range of physically active")
-        print(f"    information states in the observable universe (10^80 baryons")
-        print(f"    to 10^89 photons), suggesting that ρ_Θ is sourced not by")
-        print(f"    the total string landscape but by the present active")
-        print(f"    computational state of the universe.'")
-    else:
-        print(f"  n_required = 10^{n_exp:.1f}")
-        print(f"  Check against known physical quantities above.")
+    print()
+    print("  Recurrent toy control")
+    print(f"    C_H intact : {intact_recurrent:.3f}  [illustrative normalized value]")
+    print(f"    C_H cut    : {cut_recurrent:.3f}  [illustrative normalized value]")
+    print(f"    O_H        : {o_recurrent:.3f}")
+    print("    Interpretation: positive effect attributable to declared return edge.")
+    print("    Values are illustrative control parameters, not experimental measurements.")
+
+    print()
+    print("  O_H is an architectural/interventional quantity.")
+    print("  It is not a consciousness score or personhood probability.")
 
 
-# ── Corrected plain language summary ─────────────────────────────────────────
+# ── Scope summary ─────────────────────────────────────────────────────────────
 
-def plain_language_summary(rows):
-    print("\n── Corrected Plain Language Summary (for paper) ────────────────")
+def scope_summary():
+    print("\n── Interpretation Boundary ─────────────────────────────────────")
 
-    # Find best candidate
-    best = min(rows, key=lambda r: r[5])
-    name, T, L, P, det, gap, exp = best
+    print("""
+  DATA:
+    Public machine-readable datasets are preferred where available.
+    Otherwise the peer-reviewed collaboration result and uncertainty are used.
 
-    print(f"""
-  BEST EXPERIMENTAL CANDIDATE: {name}
-  Gap to detection: {gap:.1f} orders of magnitude ({10**gap:.0f}× improvement needed)
+  PROVENANCE:
+    PUBLISHED_RESULT never means that raw observations were reproduced.
+    Missing observations are not synthesized.
 
-  Note: The v1 summary incorrectly stated BASE was ~1 OOM from detection.
-  The corrected analysis shows {name} is the closest candidate at {gap:.1f} OOM.
-  BASE operates so cold that the Landauer signal shrinks faster than its
-  precision advantage compensates.
+  OBSERVABLES:
+    q/m, transition frequency, magnetic moment, and mass are kept distinct.
 
-  Correct statement for paper:
-  "Of the three CERN Penning trap experiments analysed, {name} represents
-  the most proximate experimental test of the ρ_Θ hypothesis, requiring
-  approximately {gap:.1f} orders of magnitude improvement in mass measurement
-  precision to detect a single-bit Landauer mass deficit at {T} K.
-  This gap, while significant, is not categorically beyond the roadmap
-  of next-generation trap development, establishing the theory as
-  falsifiable in principle within a tractable experimental timeline."
+  LANDAUER:
+    k_B T ln(2) is used as an information-thermodynamic lower bound.
+    E/c² is reported only as a mass-equivalent energy scale.
 
-  CERN OPEN DATA STATUS:
-  The portal returned CMS collision datasets — LHC particle physics data,
-  not Penning trap data. BASE and ALPHA raw trap data are not yet publicly
-  released on the Open Data Portal. The precision values used here are
-  extracted from published papers (cited above) and represent the current
-  state of the art.
-    """)
+  COALESCENCE FRAMEWORK:
+    The experimental target is feedback-dependent causal persistence:
+
+        O_H = C_H(G) - C_H(G_cut)
+
+    This is separate from apparatus energy closure.
+
+  NOT CLAIMED:
+    No new spacetime current, field, mass contribution, gravitational
+    coupling, dark-matter mechanism, dark-energy mechanism, consciousness
+    measure, or empirical confirmation is inferred by this program.
+""")
 
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
-    print("=" * 70)
-    print("  CERN Landauer Mass Feasibility Analysis  v2")
+    print("=" * 78)
+    print("  CERN / Published-Result Landauer Analysis Sandbox")
     print(f"  Run: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    print("  Fix: overflow corrected, backward calculation added")
-    print("=" * 70)
+    print("  Revision: September 2026 provenance + observable audit")
+    print("=" * 78)
 
-    datasets = find_datasets()
-    rows     = feasibility_report()
+    find_datasets()
+    provenance_report()
+
+    rows = feasibility_report()
     detection_requirements(rows)
-    cosmological_estimate()
-    dark_matter_derivation()
-    dark_light_synchronization()
-    plain_language_summary(rows)
 
-    print("\n── Data Sources ─────────────────────────────────────────────────")
-    print("  CERN Open Data Portal  : https://opendata.cern.ch")
-    print("  BASE experiment        : https://base.web.cern.ch")
-    print("  ALPHA experiment       : https://alpha.web.cern.ch")
-    print("  Ulmer et al. 2022      : https://doi.org/10.1038/s41586-021-04203-w")
-    print("  Landauer 1961          : IBM J. Res. Dev. 5(3), 183-191")
-    print("  Vopson 2019            : AIP Advances 9, 095206")
-    print("  Bekenstein 2003        : Sci. Am. 289(2), 58-65")
+    analytical_controls()
+    scope_summary()
+
+    print("\n── References ──────────────────────────────────────────────────")
+    print("  CERN Open Data Portal")
+    print("    https://opendata.cern.ch")
+    print()
+    print("  BASE")
+    print("    https://doi.org/10.1038/s41586-021-04203-w")
+    print()
+    print("  ALPHA")
+    print("    https://doi.org/10.1038/s41586-018-0017-2")
+    print()
+    print("  ATRAP")
+    print("    https://doi.org/10.1103/PhysRevLett.110.130801")
     print()
 
-def dark_matter_derivation():
-    print("\n── Dark Matter to Baryonic Information Ratio ───────────────────")
-    # Empirical data from Planck Lambda-CDM cosmology
-    rho_baryon = 4.9   # % of universe
-    rho_dm     = 26.8  # % of universe
-    empirical_ratio = rho_dm / rho_baryon
-    
-    # Theoretical 4D information-theoretic scaling (2 * Euler's Number)
-    theoretical_ratio = 2 * math.e
-    accuracy = (1 - abs(empirical_ratio - theoretical_ratio) / empirical_ratio) * 100
-    
-    print(f"  Observed Dark Matter / Baryon Ratio : {empirical_ratio:.3f}")
-    print(f"  Theoretical Informational Ratio (2e): {theoretical_ratio:.3f}")
-    print(f"  Model Mathematical Fit Accuracy     : {accuracy:.2f}%")
-    print("""
-  ✓ Analysis: The 5.47x dominance of Dark Matter maps cleanly to 2e.
-    In network architecture, 'e' is the mathematical limit for optimal 
-    information routing and natural data growth. The factor of 2 indicates
-    the structural dual-layer (read/write or input/cache) processing 
-    mesh of the 4D cosmic sphere.""")
-def dark_light_synchronization():
-    print("\n── Dark Light Sector Synchronization Bounds ────────────────────")
-    h_bar = 1.0545718e-34  # Reduced Planck constant
-    k_B = 1.380649e-23     # Boltzmann constant
-    T = 4.2                # ATRAP Cryogenic Baseline Temperature
-    
-    n_active = Decimal('1e94')
-    sigma_total = Decimal('1e500')
-    capacity_ratio = n_active / sigma_total
-    
-    # Calculate fundamental quantum information refresh speed
-    base_time = (h_bar * math.log(2)) / (k_B * T)
-    sync_delay = Decimal(base_time) * capacity_ratio
-    
-    print(f"  Standard Quantum Limit at 4.2 K : {base_time:.3e} seconds")
-    print(f"  Structural Core Capacity Ratio  : 10^-406")
-    print(f"  Dark Light Sync Refresh Rate    : {sync_delay:.3e} seconds")
-    print("""
-  ✓ Analysis: The 10^-406 synchronization interval guarantees complete 
-    non-local state consistency. This eliminates latency bugs between 
-    the 3D active physical projection and the 4D storage substrate.""")
 
 if __name__ == "__main__":
     main()

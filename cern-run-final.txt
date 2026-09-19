@@ -1,0 +1,136 @@
+==============================================================================
+  CERN / Published-Result Landauer Analysis Sandbox
+  Run: 2026-09-19 05:38
+  Revision: September 2026 provenance + observable audit
+==============================================================================
+
+── CERN Open Data Discovery ─────────────────────────────────────
+  penning trap                         0 returned hit(s)
+  BASE antiproton                      0 returned hit(s)
+  ALPHA antihydrogen                   0 returned hit(s)
+  proton antiproton mass ratio         0 returned hit(s)
+  ATRAP                                0 returned hit(s)
+  antiproton magnetic moment           0 returned hit(s)
+
+  No records were returned for the target search terms.
+  This establishes only the result of the current catalogue
+  queries; it does NOT establish that underlying data do not
+  exist elsewhere.
+
+  Published collaboration results will therefore be used for
+  target experiments configured as PUBLISHED_RESULT.
+
+── Experimental Input Provenance ────────────────────────────────
+
+  BASE (CERN AD)
+    Source type : PUBLISHED_RESULT
+    Observable  : antiproton/proton charge-to-mass ratio
+    Result      : -(q/m)_p / (q/m)_pbar = 1.000000000003(16)
+    Precision   : 1.600e-12 fractional
+    Reference   : Borchert, Ulmer et al., Nature 601, 53-57 (2022)
+    DOI         : https://doi.org/10.1038/s41586-021-04203-w
+    Mass gap    : eligible under declared assumption
+    Assumption  : For this exploratory comparison only, fractional q/m precision is treated as fractional mass sensitivity with charge magnitude held fixed. The reported BASE observable itself is q/m.
+
+  ALPHA-2 (CERN AD)
+    Source type : PUBLISHED_RESULT
+    Observable  : 1S-2S transition frequency
+    Result      : Published ALPHA 1S-2S spectroscopy result; see cited paper.
+    Precision   : 2.000e-12 fractional
+    Reference   : ALPHA Collaboration, Nature 557, 71-75 (2018)
+    DOI         : https://doi.org/10.1038/s41586-018-0017-2
+    Mass gap    : N/A — incompatible observable
+
+  ATRAP
+    Source type : PUBLISHED_RESULT
+    Observable  : antiproton magnetic moment
+    Result      : mu_pbar / mu_N = -2.792845 +/- 0.000012
+    Precision   : 4.400e-06 fractional
+    Reference   : DiSciacca et al. (ATRAP), Phys. Rev. Lett. 110, 130801 (2013)
+    DOI         : https://doi.org/10.1103/PhysRevLett.110.130801
+    Mass gap    : N/A — incompatible observable
+
+── Landauer Energy / Mass-Equivalent Scale ─────────────────────
+  Experiment                  Temp      Landauer E/bit        E/c² per bit    Mass sensitivity       Gap
+  ──────────────────────────────────────────────────────────────────────────────────────────────────────
+  BASE (CERN AD)           0.0060K           5.742e-26           6.389e-43           2.676e-39   3.6 OOM
+  ALPHA-2 (CERN AD)        0.5000K           4.785e-24           5.324e-41                 N/A       N/A
+  ATRAP                    4.2000K           4.019e-23           4.472e-40                 N/A       N/A
+
+── Exploratory Mass-Sensitivity Comparison ─────────────────────
+
+  BASE (CERN AD)
+    Observable          : antiproton/proton charge-to-mass ratio
+    Temperature         : 0.006 K
+    Landauer E/c² scale : 6.389e-43 kg/bit
+    Comparison precision: 2.676e-39 kg
+    0.1× target scale   : 6.389e-44 kg
+    Scale ratio         : 4.189e+04×
+    Gap                 : 3.6 OOM
+    Assumption          : For this exploratory comparison only, fractional q/m precision is treated as fractional mass sensitivity with charge magnitude held fixed. The reported BASE observable itself is q/m.
+
+  NOTE:
+  This is a numerical sensitivity comparison, not a prediction
+  that an additional mass deficit exists or would be measured.
+
+── Analytical Controls: Persistence vs Feedback ────────────────
+
+  Feed-forward delay line
+    C_H intact : 1.000
+    C_H cut    : 1.000
+    O_H        : 0.000
+    Interpretation: persistence without feedback-specific effect.
+
+  Recurrent toy control
+    C_H intact : 1.000  [illustrative normalized value]
+    C_H cut    : 0.350  [illustrative normalized value]
+    O_H        : 0.650
+    Interpretation: positive effect attributable to declared return edge.
+    Values are illustrative control parameters, not experimental measurements.
+
+  O_H is an architectural/interventional quantity.
+  It is not a consciousness score or personhood probability.
+
+── Interpretation Boundary ─────────────────────────────────────
+
+  DATA:
+    Public machine-readable datasets are preferred where available.
+    Otherwise the peer-reviewed collaboration result and uncertainty are used.
+
+  PROVENANCE:
+    PUBLISHED_RESULT never means that raw observations were reproduced.
+    Missing observations are not synthesized.
+
+  OBSERVABLES:
+    q/m, transition frequency, magnetic moment, and mass are kept distinct.
+
+  LANDAUER:
+    k_B T ln(2) is used as an information-thermodynamic lower bound.
+    E/c² is reported only as a mass-equivalent energy scale.
+
+  COALESCENCE FRAMEWORK:
+    The experimental target is feedback-dependent causal persistence:
+
+        O_H = C_H(G) - C_H(G_cut)
+
+    This is separate from apparatus energy closure.
+
+  NOT CLAIMED:
+    No new spacetime current, field, mass contribution, gravitational
+    coupling, dark-matter mechanism, dark-energy mechanism, consciousness
+    measure, or empirical confirmation is inferred by this program.
+
+
+── References ──────────────────────────────────────────────────
+  CERN Open Data Portal
+    https://opendata.cern.ch
+
+  BASE
+    https://doi.org/10.1038/s41586-021-04203-w
+
+  ALPHA
+    https://doi.org/10.1038/s41586-018-0017-2
+
+  ATRAP
+    https://doi.org/10.1103/PhysRevLett.110.130801
+
