@@ -1,0 +1,214 @@
+==============================================================================
+  CERN / Published-Result Landauer Analysis Sandbox
+  Run: 2026-11-20 08:51
+  Revision: November 2026 — Eq. C1 controls computed; BASE 16 ppt
+  corrected to 1.6e-11; temperatures labelled by basis
+==============================================================================
+
+── CERN Open Data Discovery ─────────────────────────────────────
+  penning trap                         0 returned hit(s)
+  BASE antiproton                      0 returned hit(s)
+  ALPHA antihydrogen                   0 returned hit(s)
+  proton antiproton mass ratio         0 returned hit(s)
+  ATRAP                                0 returned hit(s)
+  antiproton magnetic moment           0 returned hit(s)
+
+  No records were returned for the target search terms.
+  This establishes only the result of the current catalogue
+  queries; it does NOT establish that underlying data do not
+  exist elsewhere.
+
+  Published collaboration results will therefore be used for
+  target experiments configured as PUBLISHED_RESULT.
+
+── Experimental Input Provenance ────────────────────────────────
+
+  BASE (CERN AD)
+    Source type : PUBLISHED_RESULT
+    Observable  : antiproton/proton charge-to-mass ratio
+    Result      : -(q/m)_p / (q/m)_pbar = 1.000000000003(16)
+    Precision   : 1.600e-11 fractional
+    Temperature : 0.006 K
+    Temp. basis : ASSUMED operating temperature. No citable source was found for 0.006 K as the BASE apparatus temperature (searched 2026-11-20); published figures point to 6 K trap surfaces and Tz ~ 1.92 K. Landauer scale is linear in T — see TEMPERATURE_NOTE.
+    Reference   : Borchert, Ulmer et al., Nature 601, 53-57 (2022)
+    DOI         : https://doi.org/10.1038/s41586-021-04203-w
+    Prospective : PROSPECTIVE ONLY (no number plugged in): BASE demonstrated coherent spectroscopy of a single antiproton spin — the first antimatter qubit — with spin coherence times of about 50 s (Latacz et al., Nature 644, 64-68 (2025), DOI 10.1038/s41586-025-09323-1). This points to at least tenfold improved magnetic-moment tests in future; it changes no value in this sandbox.
+    Mass gap    : eligible under declared assumption
+    Assumption  : For this exploratory comparison only, fractional q/m precision is treated as fractional mass sensitivity with charge magnitude held fixed. The reported BASE observable itself is q/m.
+
+  BASE magnetic moment (Smorra 2017)
+    Source type : PUBLISHED_RESULT
+    Observable  : antiproton magnetic moment
+    Result      : mu_pbar = -2.7928473441(42) mu_N
+    Precision   : 1.500e-09 fractional
+    Temperature : 0.006 K
+    Temp. basis : ASSUMED operating temperature — same BASE assumption as the q/m row above; see TEMPERATURE_NOTE.
+    Reference   : Smorra et al. (BASE), Nature 550, 371-374 (2017)
+    DOI         : https://doi.org/10.1038/nature24048
+    Mass gap    : N/A — incompatible observable
+
+  ALPHA-2 (CERN AD)
+    Source type : PUBLISHED_RESULT
+    Observable  : 1S-2S transition frequency
+    Result      : f_d-d = 2,466,061,103,079.4(5.4) kHz (d-d hyperfine component of the 1S-2S transition)
+    Precision   : 2.000e-12 fractional
+    Temperature : 0.5 K
+    Temp. basis : ASSUMED operating temperature, set by the magnetic-trap depth scale: ALPHA trap well depth 0.54 K (ALPHA Collab., Nature Physics 7, 558-564 (2011)); CERN ALPHA pages put the trap depth at 'about 0.5 Kelvin'. The trapped-atom distribution itself is ~200 mK truncated at that depth.
+    Reference   : ALPHA Collaboration, Nature 557, 71-75 (2018)
+    DOI         : https://doi.org/10.1038/s41586-018-0017-2
+    Mass gap    : N/A — incompatible observable
+
+  ALPHA 1S-2S hyperfine components (2025)
+    Source type : PUBLISHED_RESULT
+    Observable  : 1S-2S transition frequency, c-c and d-d hyperfine components
+    Result      : c-c component determined with the same precision as the d-d component (~2 ppt); combined with the 1S hyperfine splitting this yields the 2S hyperfine splitting
+    Precision   : 2.000e-12 fractional
+    Temperature : 0.5 K
+    Temp. basis : ASSUMED operating temperature — same ALPHA trap-depth scale as the 1S-2S row above.
+    Reference   : ALPHA Collaboration, Nature Physics 21 (2025)
+    DOI         : https://doi.org/10.1038/s41567-024-02712-9
+    Mass gap    : N/A — incompatible observable
+
+  ALPHA ground-state hyperfine splitting (2026)
+    Source type : PUBLISHED_RESULT
+    Observable  : ground-state hyperfine splitting frequency a_1S/h
+    Result      : a_1S/h = 1,420,404.8 +/- 1.1 (stat.) +/- 5.6 (sys.) kHz in a 1-T magnetic field (4 ppm)
+    Precision   : 4.000e-06 fractional
+    Temperature : 0.5 K
+    Temp. basis : ASSUMED operating temperature — same ALPHA trap-depth scale as the 1S-2S row above.
+    Reference   : Akbari et al. (ALPHA Collaboration), Nature 653, 1022-1026 (2026)
+    DOI         : https://doi.org/10.1038/s41586-026-10556-x
+    Mass gap    : N/A — incompatible observable
+
+  ATRAP (historical)
+    Source type : PUBLISHED_RESULT
+    Observable  : antiproton magnetic moment
+    Result      : mu_pbar / mu_N = -2.792845 +/- 0.000012
+    Precision   : 4.400e-06 fractional
+    Temperature : 4.2 K
+    Temp. basis : SOURCED electrode temperature: 'Thermal contact with liquid helium keeps the electrodes at 4.2 K' (CERN Courier on DiSciacca et al. 2013).
+    Reference   : DiSciacca et al. (ATRAP), Phys. Rev. Lett. 110, 130801 (2013)
+    DOI         : https://doi.org/10.1103/PhysRevLett.110.130801
+    Mass gap    : N/A — incompatible observable
+
+── Landauer Energy / Mass-Equivalent Scale ─────────────────────
+  Experiment                                          Temp      Landauer E/bit        E/c² per bit    Mass sensitivity       Gap
+  ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  BASE (CERN AD)                                   0.0060K           5.742e-26           6.389e-43           2.676e-38   4.6 OOM
+  BASE magnetic moment (Smorra 2017)               0.0060K           5.742e-26           6.389e-43                 N/A       N/A
+  ALPHA-2 (CERN AD)                                0.5000K           4.785e-24           5.324e-41                 N/A       N/A
+  ALPHA 1S-2S hyperfine components (2025)          0.5000K           4.785e-24           5.324e-41                 N/A       N/A
+  ALPHA ground-state hyperfine splitting (2026)    0.5000K           4.785e-24           5.324e-41                 N/A       N/A
+  ATRAP (historical)                               4.2000K           4.019e-23           4.472e-40                 N/A       N/A
+
+  NOTE: Temperatures are labelled operating-temperature assumptions (see temperature_basis per experiment). The Landauer scale is linear in T: a 10x higher true temperature lowers the BASE 1-bit gap by 1 OOM.
+
+── Exploratory Mass-Sensitivity Comparison ─────────────────────
+
+  BASE (CERN AD)
+    Observable          : antiproton/proton charge-to-mass ratio
+    Temperature         : 0.006 K
+    Landauer E/c² scale : 6.389e-43 kg/bit
+    Comparison precision: 2.676e-38 kg
+    Ratio to 1-bit scale: 4.189e+04×
+    Gap to 1-bit scale  : 4.6 OOM
+    0.1× target scale   : 6.389e-44 kg
+    Ratio to 0.1× target: 4.189e+05×
+    Gap to 0.1× target  : 5.6 OOM
+    Assumption          : For this exploratory comparison only, fractional q/m precision is treated as fractional mass sensitivity with charge magnitude held fixed. The reported BASE observable itself is q/m.
+
+  NOTE:
+  This is a numerical sensitivity comparison, not a prediction
+  that an additional mass deficit exists or would be measured.
+
+  TEMPERATURE SENSITIVITY:
+  Temperatures are labelled operating-temperature assumptions (see temperature_basis per experiment). The Landauer scale is linear in T: a 10x higher true temperature lowers the BASE 1-bit gap by 1 OOM.
+  For BASE: at T = 1.92 K (published axial temperature) the
+  1-bit gap would be ~2.1 OOM; at T = 6 K (trap-surface
+  temperature) ~1.6 OOM — not 4.6 OOM. The BASE gap is
+  conditional on the assumed 0.006 K operating temperature.
+
+── Analytical Controls: Persistence vs Feedback ────────────────
+
+  Feed-forward delay line (Proposition 1: deterministic shift,
+  disjoint support -> D_JS = 1 bit, computed)
+    C_H intact : 1.000
+    C_H cut    : 1.000
+    O_H        : 0.000
+    Interpretation: persistence without feedback-specific effect.
+
+  Recurrent register control (App. C, Eq. C1: q = 0.05,
+  tau = 1..6, uniform weights)
+    D_JS(tau=1) : 0.713603
+    D_JS(tau=2) : 0.547057
+    D_JS(tau=3) : 0.427669
+    D_JS(tau=4) : 0.337854
+    D_JS(tau=5) : 0.268663
+    D_JS(tau=6) : 0.214603
+    C_H intact : 0.418  [mean of lag terms]
+    C_H cut    : 0.000  [no lag term survives the cut]
+    O_H        : 0.418
+    Interpretation: positive effect attributable to declared return edge.
+    Values are computed from Eq. C1, not experimental measurements.
+
+  O_H is an architectural/interventional quantity.
+  It is not a consciousness score or personhood probability.
+
+── Interpretation Boundary ─────────────────────────────────────
+
+  DATA:
+    Public machine-readable datasets are preferred where available.
+    Otherwise the peer-reviewed collaboration result and uncertainty are used.
+
+  PROVENANCE:
+    PUBLISHED_RESULT never means that raw observations were reproduced.
+    Missing observations are not synthesized.
+
+  OBSERVABLES:
+    q/m, transition frequency, magnetic moment, and mass are kept distinct.
+
+  LANDAUER:
+    k_B T ln(2) is used as an information-thermodynamic lower bound.
+    E/c² is reported only as a mass-equivalent energy scale.
+
+  COALESCENCE FRAMEWORK:
+    The experimental target is feedback-dependent causal persistence:
+
+        O_H = C_H(G) - C_H(G_cut)
+
+    This is separate from apparatus energy closure.
+
+  NOT CLAIMED:
+    No new spacetime current, field, mass contribution, gravitational
+    coupling, dark-matter mechanism, dark-energy mechanism, consciousness
+    measure, or empirical confirmation is inferred by this program.
+
+
+── References ──────────────────────────────────────────────────
+  CERN Open Data Portal
+    https://opendata.cern.ch
+
+  BASE q/m (16 ppt)
+    https://doi.org/10.1038/s41586-021-04203-w
+
+  BASE magnetic moment, 1.5 ppb (Smorra et al. 2017)
+    https://doi.org/10.1038/nature24048
+
+  BASE coherent single-antiproton spin qubit, ~50 s (Latacz et al. 2025)
+    https://doi.org/10.1038/s41586-025-09323-1
+
+  ALPHA 1S-2S (Ahmadi et al. 2018)
+    https://doi.org/10.1038/s41586-018-0017-2
+
+  ALPHA 1S-2S hyperfine components (2025)
+    https://doi.org/10.1038/s41567-024-02712-9
+
+  ALPHA ground-state hyperfine splitting, 4 ppm (Akbari et al. 2026)
+    https://doi.org/10.1038/s41586-026-10556-x
+
+  ATRAP magnetic moment, historical (DiSciacca et al. 2013)
+    https://doi.org/10.1103/PhysRevLett.110.130801
+
+  Proton mass: NIST CODATA 2022, 1.67262192595(52)e-27 kg
+    https://physics.nist.gov/cgi-bin/cuu/Value?mp
+
